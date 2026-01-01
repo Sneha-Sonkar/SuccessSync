@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ SuccessSync Vault ✨</title>
+    <style>
+        :root {
+            --primary: #9b59b6;
+            --soft-purple: #dcd0ff;
+            --deep-purple: #6c5ce7;
+            --pink-sparkle: #ffb7ce;
+            --white: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f3f0f7;
+            /* Glitter Effect */
+            background-image: radial-gradient(#fff 1px, transparent 1px), radial-gradient(#fff 1px, transparent 1px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            color: #4a4a4a;
+            padding: 10px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 20px auto;
+            background: var(--white);
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 0 10px 40px rgba(155, 89, 182, 0.2);
+            border: 2px solid var(--soft-purple);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Navigation Scrollable Bar */
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            background: #f0ebf7;
+            padding: 10px;
+            border-radius: 20px;
+            overflow-x: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+        .nav-tabs::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+        .nav-link {
+            cursor: pointer;
+            padding: 10px 18px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: var(--primary);
+            transition: 0.3s;
+            white-space: nowrap;
+            font-size: 0.85rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 5px 15px rgba(155, 89, 182, 0.4);
+        }
+
+        h1 { text-align: center; color: var(--deep-purple); font-size: 1.8rem; margin-top: 0; text-shadow: 1px 1px 2px #fff; }
+        h2 { color: var(--primary); font-size: 1.1rem; border-bottom: 2px solid var(--soft-purple); margin-top: 20px; padding-bottom: 5px; }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.4s ease-in; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Inputs */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 10px; border: 1px solid var(--soft-purple); text-align: left; font-size: 0.9rem; }
+        th { background: var(--soft-purple); }
+        
+        input[type="checkbox"] { transform: scale(1.3); accent-color: var(--primary); cursor: pointer; }
+        textarea, input[type="number"], input[type="date"], select {
+            width: 100%; padding: 12px; border: 1px solid var(--soft-purple);
+            border-radius: 12px; background: #faf9ff; margin-top: 8px; box-sizing: border-box;
+            font-family: inherit;
+        }
+        label { display: block; margin-top: 15px; font-weight: bold; color: var(--deep-purple); font-size: 0.9rem; }
+
+        .btn-save {
+            width: 100%; padding: 15px; border: none; border-radius: 15px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 25px;
+            background: linear-gradient(45deg, var(--primary), var(--deep-purple));
+            color: white; box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        .history-card {
+            background: #fff; border: 1px solid var(--soft-purple);
+            padding: 15px; border-radius: 20px; margin-top: 15px;
+            border-left: 8px solid var(--primary);
+            position: relative;
+        }
+
+        .tag {
+            display: inline-block; background: var(--soft-purple);
+            color: var(--deep-purple); font-size: 0.7rem;
+            padding: 2px 8px; border-radius: 10px; margin-right: 5px; margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>✨ SuccessSync ✨</h1>
+
+    <div class="nav-tabs">
+        <div class="nav-link active" onclick="showPage('health')">Health</div>
+        <div class="nav-link" onclick="showPage('internship')">Intern Prep</div>
+        <div class="nav-link" onclick="showPage('academics')">Academics</div>
+        <div class="nav-link" onclick="showPage('cycle')">Cycles 🌸</div>
+        <div class="nav-link" onclick="showPage('history')">History</div>
+        <div class="nav-link" onclick="showPage('settings')">Settings ⚙️</div>
+    </div>
+<div id="settings" class="page">
+        <h2>☁️ Cloud Sync Setup</h2>
+        <p style="font-size: 0.8rem;">Enter your GitHub details to sync data between phone and laptop.</p>
+        <input type="password" id="ghToken" placeholder="GitHub Personal Access Token">
+        <input type="text" id="gistId" placeholder="Gist ID">
+        <button class="btn btn-cloud" onclick="saveSettings()">Connect & Sync</button>
+        <button class="btn" style="background: #9b59b6;" onclick="exportJSON()">Download Backup (.json)</button>
+    </div>
+    <div id="health" class="page active">
+        <h2>💊 Medications (BDPC)</h2>
+        <table>
+            <tr><th>Med</th><th>Lunch</th><th>Dinner</th></tr>
+            <tr><td>Blue (2 tab)</td><td><input type="checkbox" id="blue_L"></td><td><input type="checkbox" id="blue_D"></td></tr>
+            <tr><td>Sweet (1 tab)</td><td><input type="checkbox" id="sweet_L"></td><td><input type="checkbox" id="sweet_D"></td></tr>
+            <tr><td>Another (1 tab)</td><td><input type="checkbox" id="another_L"></td><td><input type="checkbox" id="another_D"></td></tr>
+            <tr><td>Bitter Syrup</td><td><input type="checkbox" id="bitter_L"></td><td><input type="checkbox" id="bitter_D"></td></tr>
+            <tr><td>Strange Syrup</td><td><input type="checkbox" id="strange_L"></td><td><input type="checkbox" id="strange_D"></td></tr>
+        </table>
+        <h2>🏃 Fitness & Vibes</h2>
+        <input type="number" id="steps" placeholder="Steps walked today...">
+        <textarea id="happy" placeholder="What made you happy today?"></textarea>
+    </div>
+
+    <div id="internship" class="page">
+        <h2>💼 Internship Prep Work</h2>
+        <label>Technical Skills (Coding/Tools):</label>
+        <textarea id="intern_tech" placeholder="What technical skills did you practice?"></textarea>
+        
+        <label>Soft Skills & Communication:</label>
+        <textarea id="intern_soft" placeholder="Meetings, emails, or presentation prep..."></textarea>
+        
+        <label>Project Tasks:</label>
+        <textarea id="intern_project" placeholder="Specific internship project work..."></textarea>
+        
+        <label>Daily Win:</label>
+        <textarea id="intern_win" placeholder="What was your biggest success at work today?"></textarea>
+    </div>
+
+    <div id="academics" class="page">
+        <h2>📚 Subject Notes</h2>
+        <label>DSA:</label><textarea id="dsa"></textarea>
+        <label>SI:</label><textarea id="si"></textarea>
+        <label>ASP:</label><textarea id="asp"></textarea>
+        <label>RA:</label><textarea id="ra"></textarea>
+        <label>Optimization:</label><textarea id="opt"></textarea>
+    </div>
+
+    <div id="cycle" class="page">
+        <h2>🌸 Period Tracker</h2>
+        <div style="background: #fff0f5; padding: 15px; border-radius: 15px; border: 2px dashed var(--pink-sparkle); text-align: center;">
+            <p><strong>Period Status:</strong></p>
+            <select id="periodStatus">
+                <option value="No">No</option>
+                <option value="Yes">Yes - Started Today</option>
+                <option value="Ongoing">Yes - Ongoing</option>
+            </select>
+            <p style="margin-top:10px;"><strong>Date:</strong></p>
+            <input type="date" id="periodDate">
+        </div>
+    </div>
+
+    <div id="history" class="page">
+        <h2>📊 Past Analysis</h2>
+        <div id="logList"></div>
+    </div>
+
+<button class="btn btn-save" id="saveBtn" onclick="saveData()">Save & Sync ✨</button></div>
+
+<script>
+    let editModeId = null; // To track if we are editing an entry
+    let logs = [];
+
+    // Initialize: Load from local and then sync with Cloud
+    window.onload = async () => {
+        const localData = localStorage.getItem('megaTracker');
+        logs = localData ? JSON.parse(localData) : [];
+        
+        // Auto-sync if credentials exist
+        if (localStorage.getItem('ghToken') && localStorage.getItem('gistId')) {
+            await syncWithCloud();
+        } else {
+            displayLogs();
+        }
+    };
+
+    function showPage(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        // Ensure we handle the navigation click aesthetic
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
+
+        if (pageId === 'history') {
+            displayLogs();
+            if (window.renderCharts) renderCharts(); // Call graph function if defined
+        }
+    }
+
+    // Cloud Sync Logic
+    async function syncWithCloud() {
+        const token = localStorage.getItem('ghToken');
+        const id = localStorage.getItem('gistId');
+        if (!token || !id) return;
+
+        try {
+            const response = await fetch(`https://api.github.com/gists/${id}`, {
+                headers: { 'Authorization': `token ${token}` }
+            });
+            const data = await response.json();
+            const cloudLogs = JSON.parse(data.files["success_data.json"].content);
+            
+            // Sync: Use cloud data as master
+            logs = cloudLogs;
+            localStorage.setItem('megaTracker', JSON.stringify(logs));
+            displayLogs();
+            console.log("Cloud sync complete ✨");
+        } catch (e) {
+            console.error("Sync failed:", e);
+        }
+    }
+
+    async function saveData() {
+        const entry = {
+            id: editModeId ? editModeId : Date.now(),
+            date: editModeId ? logs.find(l => l.id === editModeId).date : new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }),
+            meds: document.querySelectorAll('#health input[type="checkbox"]:checked').length,
+            steps: document.getElementById('steps').value || 0,
+            happy: document.getElementById('happy').value,
+            intern: {
+                tech: document.getElementById('intern_tech').value,
+                soft: document.getElementById('intern_soft').value,
+                project: document.getElementById('intern_project').value,
+                win: document.getElementById('intern_win').value
+            },
+            academics: {
+                dsa: document.getElementById('dsa').value,
+                si: document.getElementById('si').value,
+                asp: document.getElementById('asp').value,
+                ra: document.getElementById('ra').value,
+                opt: document.getElementById('opt').value
+            },
+            period: document.getElementById('periodStatus').value,
+            periodDate: document.getElementById('periodDate').value
+        };
+
+        if (editModeId) {
+            const index = logs.findIndex(l => l.id === editModeId);
+            logs[index] = entry;
+            editModeId = null;
+        } else {
+            logs.unshift(entry);
+        }
+
+        // Save locally
+        localStorage.setItem('megaTracker', JSON.stringify(logs));
+
+        // Save to Cloud (GitHub Gist)
+        const token = localStorage.getItem('ghToken');
+        const id = localStorage.getItem('gistId');
+        if (token && id) {
+            try {
+                await fetch(`https://api.github.com/gists/${id}`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `token ${token}` },
+                    body: JSON.stringify({
+                        files: { "success_data.json": { content: JSON.stringify(logs) } }
+                    })
+                });
+            } catch (e) {
+                alert("Cloud save failed, but saved locally!");
+            }
+        }
+
+        alert("Progress Recorded & Synced! ✨");
+        location.reload(); 
+    }
+
+    function displayLogs() {
+        const logList = document.getElementById('logList');
+        if (!logList) return;
+        
+        logList.innerHTML = logs.length === 0 ? "The vault is empty." : "";
+
+        logs.forEach(log => {
+            const card = document.createElement('div');
+            card.className = 'history-card';
+            
+            let internTags = "";
+            if(log.intern && log.intern.tech) internTags += `<span class="tag">Tech Prep</span>`;
+            if(log.intern && log.intern.project) internTags += `<span class="tag">Work Task</span>`;
+            
+            card.innerHTML = `
+                <div style="font-weight:bold; color:var(--deep-purple)">📅 ${log.date}</div>
+                <div style="font-size:0.85rem; margin-top:5px;">
+                    🏃 Steps: ${log.steps} | 💊 Meds: ${log.meds}/10
+                </div>
+                <div style="margin-top:5px;">${internTags}</div>
+                <div style="margin-top:8px; font-size:0.85rem; border-top: 1px solid #eee; padding-top:5px;">
+                    <strong>Work Win:</strong> ${log.intern ? log.intern.win : 'N/A'}
+                </div>
+                <div style="margin-top:10px; display:flex; gap:10px;">
+                    <button onclick="editEntry(${log.id})" style="color:var(--primary); background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:bold;">Edit</button>
+                    <button onclick="deleteEntry(${log.id})" style="color:red; background:none; border:none; cursor:pointer; font-size:0.75rem; font-weight:bold;">Delete</button>
+                </div>
+            `;
+            logList.appendChild(card);
+        });
+    }
+
+    function editEntry(id) {
+        const log = logs.find(l => l.id === id);
+        if (!log) return;
+
+        editModeId = id;
+        
+        // Fill Health
+        document.getElementById('steps').value = log.steps;
+        document.getElementById('happy').value = log.happy;
+        
+        // Fill Internship
+        document.getElementById('intern_tech').value = log.intern.tech;
+        document.getElementById('intern_soft').value = log.intern.soft;
+        document.getElementById('intern_project').value = log.intern.project;
+        document.getElementById('intern_win').value = log.intern.win;
+
+        // Fill Academics
+        document.getElementById('dsa').value = log.academics.dsa;
+        document.getElementById('si').value = log.academics.si;
+        document.getElementById('asp').value = log.academics.asp;
+        document.getElementById('ra').value = log.academics.ra;
+        document.getElementById('opt').value = log.academics.opt;
+
+        // Fill Cycle
+        document.getElementById('periodStatus').value = log.period;
+        document.getElementById('periodDate').value = log.periodDate;
+
+        showPage('health'); // Redirect to form
+        document.getElementById('saveBtn').innerText = "Update Entry ✨";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteEntry(id) {
+        if(confirm("Permanently delete this entry from local and cloud?")) {
+            logs = logs.filter(l => l.id !== id);
+            localStorage.setItem('megaTracker', JSON.stringify(logs));
+            
+            // Update cloud after delete
+            const token = localStorage.getItem('ghToken');
+            const gistId = localStorage.getItem('gistId');
+            if (token && gistId) {
+                await fetch(`https://api.github.com/gists/${gistId}`, {
+                    method: 'PATCH',
+                    headers: { 'Authorization': `token ${token}` },
+                    body: JSON.stringify({
+                        files: { "success_data.json": { content: JSON.stringify(logs) } }
+                    })
+                });
+            }
+            displayLogs();
+        }
+    }
+
+    // Helper for Settings page
+    function saveSettings() {
+        localStorage.setItem('ghToken', document.getElementById('ghToken').value);
+        localStorage.setItem('gistId', document.getElementById('gistId').value);
+        syncWithCloud();
+    }
+</script>
+
+</body>
+</html>
